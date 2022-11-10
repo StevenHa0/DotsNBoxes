@@ -1,22 +1,21 @@
-import logo from './logo.svg';
-import './App.css';
+import './App.css'
+import dots from './dots.png'
+import { Link } from "react-router-dom";
+import { Button, Center } from '@mantine/core';
 
-function App() {
+const App = () => {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
+        <img src={dots} className="App-logo" alt="logo" />
+        <p className='title'>
+          Dots N Boxes
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <Center>
+          <Button size="lg" variant="subtle" component={Link} to="/game">
+              Start Game
+          </Button>
+        </Center>
       </header>
     </div>
   );
