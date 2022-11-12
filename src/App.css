@@ -7,6 +7,11 @@
   pointer-events: none;
 }
 
+.Game-logo {
+  height: 45vmin;
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
@@ -50,23 +55,23 @@ body {
   height: 50vh;
 }
 
-.canvas {
-  margin-left: -25px;
-  width: 45vh;
-  height: 48vh;
-}
-
-.player1 {
+#player1 {
   margin: 20px;
   color: red;
 }
 
-.player2 {
+#count {
+  margin-left: 60px;
+  margin-right: 60px;
+  margin-bottom: -10px;
+}
+
+#player2 {
   margin: 20px;
   color: blue;
 }
 
-.player3 {
+#player3 {
   margin: 20px;
   color: green;
 }
