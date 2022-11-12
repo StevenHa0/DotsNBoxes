@@ -7,7 +7,7 @@ import Game from './Game';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <BrowserRouter>
+  <BrowserRouter basename={process.env.PUBLIC_URL}>
     <Routes>
       <Route exact path='/' element={<App/>} />
       <Route path="/game" element={<Game/>}  />
