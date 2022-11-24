@@ -28,10 +28,20 @@ const MARGIN = SIZE - (GRID_SIZE) * CELL;
 
 // game vars
 var currentTurn = 1;
-var stage, drawLayer;
-var color;
+var totalCount = 0;
 var firstPlace;
 var firstPlacePlayer;
+var sides = {};
+var square1filled = false;
+var square2filled = false;
+var square3filled = false;
+var square4filled = false;
+var square5filled = false;
+var square6filled = false;
+var square7filled = false;
+var square8filled = false;
+var square9filled = false;
+var squaresfilled = 0;
 
 // colors
 const COLOR_P1 = 'red';
@@ -47,12 +57,30 @@ const Game = () => {
 
   // State to open and close pop-up windows
   const [endGameOpened, setEndGameOpened] = useState(false);
-  const [rulesOpened, setRulesOpened] = useState(false);
 
   // Functions to increment player count by 1
-  function incrementPlayer1Count() { setCount1(player1Count + 1) };
-  function incrementPlayer2Count () { setCount2(player2Count + 1) };
-  function incrementPlayer3Count() { setCount3(player3Count + 1) };
+  function incrementPlayer1Count() { setCount1(player1Count => player1Count + 1) };
+  function incrementPlayer2Count() { setCount2(player2Count => player2Count + 1) };
+  function incrementPlayer3Count() { setCount3(player3Count => player3Count + 1) };
+
+  function incrementPlayerCount() {
+    switch(currentTurn) {
+      case 1:
+        incrementPlayer1Count();
+        totalCount++;
+        break;
+      case 2:
+        incrementPlayer2Count();
+        totalCount++;
+        break;
+      case 3:
+        incrementPlayer3Count();
+        totalCount++;
+        break;
+      default:
+        break;
+    }
+  }
 
   function drawDot(x, y, layer) {
     const dot = new Konva.Circle({
@@ -62,6 +90,96 @@ const Game = () => {
       radius: 6,
     });
     layer.add(dot);
+  }
+
+  function drawEmptyLine(x1, y1, x2, y2, layer, id) {
+    const line = new Konva.Line({
+        stroke: 'black',
+        opacity: 0.2,
+        strokeWidth: 5,
+        lineCap: 'round',
+        lineJoin: 'round',
+        points: [x1, y1, x2, y2],
+        id: id.toString()
+    });
+    line.on('click', function () {
+      if (!sides[id]) {
+        this.stroke(getColor());
+        this.opacity(1);
+        addLine(id, layer);
+      }
+    });
+    layer.add(line);
+  }
+
+  function addLine(id, layer) {
+    sides[id] = true;
+    console.log(totalCount);
+    if (squareComplete(layer)) {
+      // TODO: fill complete square with player color
+      if (totalCount === 9) {
+        setEndGameOpened(true);
+        endGame();
+      }
+    } else {
+      currentTurn++
+      if (currentTurn > 3)
+        currentTurn = 1;
+    }
+  }
+
+  function squareComplete() {
+    const prev_squaresfilled = squaresfilled;
+    if (!square1filled && sides[0] && sides[1] && sides[6] && sides[7]) {
+      square1filled = true;
+      squaresfilled++;
+      incrementPlayerCount();
+    }
+    if (!square2filled && sides[2] && sides[7] && sides[8] && sides[13]) {
+      square2filled = true;
+      squaresfilled++;
+      incrementPlayerCount();
+    }
+    if (!square3filled && sides[4] && sides[13] && sides[10] && sides[19]) {
+      square3filled = true;
+      squaresfilled++;
+      incrementPlayerCount();
+    }
+    if (!square4filled && sides[6] && sides[3] && sides[9] && sides[12]) {
+      square4filled = true;
+      squaresfilled++;
+      incrementPlayerCount();
+    }
+    if (!square5filled && sides[8] && sides[9] && sides[14] && sides[15]) {
+      square5filled = true;
+      squaresfilled++;
+      incrementPlayerCount();
+    }
+    if (!square6filled && sides[10] && sides[15] && sides[16] && sides[21]) {
+      square6filled = true;
+      squaresfilled++;
+      incrementPlayerCount();
+    }
+    if (!square7filled && sides[12] && sides[5] && sides[18] && sides[11]) {
+      square7filled = true;
+      squaresfilled++;
+      incrementPlayerCount();
+    }
+    if (!square8filled && sides[14] && sides[11] && sides[20] && sides[17]) {
+      square8filled = true;
+      squaresfilled++;
+      incrementPlayerCount();
+    }
+    if (!square9filled && sides[16] && sides[17] && sides[22] && sides[23]) {
+      square9filled = true;
+      squaresfilled++;
+      incrementPlayerCount();
+    }
+    // if the amount of squares filled before is less than now, return true
+    if (prev_squaresfilled < squaresfilled)
+      return true;
+    else
+      return false;
   }
 
   function getX(x) {
@@ -81,114 +199,37 @@ const Game = () => {
     stage.getRelativePointerPosition();
     const layer = new Konva.Layer();
     stage.add(layer);
+    // Draw empty lines for the user to click on
+    var id = 0;
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 3; j++) {
+        // horizontal line
+        drawEmptyLine(getX(j), getY(i), getX(j+1), getY(i), layer, id);
+        id++;
+        // vertical line
+        drawEmptyLine(getX(i), getY(j), getX(i), getY(j+1), layer, id);
+        id++;
+      }
+    }
     // Draw the corresponding 4 x 4 dots
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 4; j++) {
-        drawDot(getX(j), getY(i), layer)
+        drawDot(getX(j), getY(i), layer);
       }
     }
-    return stage
-  }
-
-  function drawLine() {
-    var isDrawing = false;
-    var lastLine;
-    stage.on('mousedown touchstart', function (e) {
-      color = getColor();
-      isDrawing = true;
-      var pos = stage.getPointerPosition();
-      lastLine = new Konva.Line({
-        stroke: color,
-        strokeWidth: 5,
-        lineCap: 'round',
-        lineJoin: 'round',
-        points: [pos.x, pos.y, pos.x, pos.y],
-      });
-      drawLayer.add(lastLine);
-    });
-
-    stage.on('mouseup touchend', function () {
-      isDrawing = false;
-    });
-
-    // drawing
-    stage.on('mousemove touchmove', function (e) {
-      if (!isDrawing) {
-        return;
-      }
-
-      const pos = stage.getPointerPosition();
-      var newPoints = lastLine.points().concat([pos.x, pos.y]);
-      lastLine.points(newPoints);
-    });
-  }
-
-  function addDrawLayer(stage) {
-    drawLayer = new Konva.Layer();
-    stage.add(drawLayer);
+    return stage;
   }
 
   function getColor() {
     if (currentTurn === 1) {
-      currentTurn = 2;
       return COLOR_P1;
     }
     else if (currentTurn === 2) {
-      currentTurn = 3;
       return COLOR_P2;
     }
     else if (currentTurn === 3) {
-      currentTurn = 1;
       return COLOR_P3;
     }
-  }
-
-  function rulesButton() {
-    // implement restart button to refresh page
-    let restart = document.getElementById("restart");
-    restart.addEventListener('click', () => {
-      
-    });
-  }
-
-  function restartButton() {
-    // implement restart button to refresh page
-    let restart = document.getElementById("restart");
-    restart.addEventListener('click', () => {
-      document.location.reload();
-    });
-  }
-
-  function endGameButton() {
-    // implement end game button to display results
-    let endgame = document.getElementById("end-game");
-    endgame.addEventListener('click', () => {
-      
-    });
-  }
-
-  function player1Button() {
-    // set button 1 to player 1 drawing
-    let btnplayer1 = document.getElementById("player1");
-    btnplayer1.addEventListener('click', () => {
-      currentTurn = 1;
-    });
-  }
-
-  function player2Button() {
-    // set button 2 to player 2 drawing
-    let btnplayer2 = document.getElementById("player2");
-    btnplayer2.addEventListener('click', () => {
-      currentTurn = 2;
-    });
-  }
-
-  function player3Button() {
-    // set button 3 to player 3 drawing
-    let btnplayer3 = document.getElementById("player3");
-    btnplayer3.addEventListener('click', () => {
-      currentTurn = 3;
-    });
   }
 
   function endGame() {
@@ -204,14 +245,7 @@ const Game = () => {
   }
 
   useEffect(() => {
-    stage = drawStage();
-    addDrawLayer(stage);
-    drawLine();
-    restartButton();
-    endGameButton();
-    player1Button();
-    player2Button();
-    player3Button();
+    drawStage();
   }, [])
 
   return (
@@ -223,16 +257,7 @@ const Game = () => {
       </Center>
       <Center>
           <Button size="lg" variant="subtle" component={Link} to="/">
-              Back to Landing Page
-          </Button>
-          <Button onClick={() => setRulesOpened(true) } id="rules" size="lg" variant="subtle" > 
-              Rules
-          </Button>
-          <Button id="restart" size="lg" variant="subtle" > 
-              Restart
-          </Button>
-          <Button onClick={() => { setEndGameOpened(true); endGame(); }} id="end-game" size="lg" variant="subtle" > 
-              End Game
+              Home
           </Button>
       </Center>
       <Center>
@@ -248,35 +273,10 @@ const Game = () => {
           <h1>Results:</h1>
           <p>Winner: {firstPlacePlayer} with a score of {firstPlace}</p>
       </Modal>
-      <Modal opened={rulesOpened} onClose={() => {
-          setRulesOpened(false);
-        }}
-      >
-          <h3>Rules:</h3>
-          <ol>
-            <li>
-              Click on the player who would like to start the game. 
-              If a player is not selected, Player 1 is automatically chosen.</li>
-            <br/>
-            <li>
-              Manually draw a line from one dot to another. Lines must only
-              be drawn vertically or horizontally to the nearest dot.
-            </li>
-            <br/>
-            <li>
-              If a player completes a square, click on the player to increase their
-              score. That player is able to draw again.
-            </li>
-            <br/>
-            <li>
-              To see the results, click on the "End Game" button to see the winner!
-            </li>
-          </ol>
-      </Modal>
       <Center>
-        <Button onClick={incrementPlayer1Count} variant="outline" color="dark" id='player1'>Player 1</Button>
-        <Button onClick={incrementPlayer2Count} variant="outline" color="dark" id='player2'>Player 2</Button>
-        <Button onClick={incrementPlayer3Count} variant="outline" color="dark" id='player3'>Player 3</Button>
+        <p variant="outline" color="dark" id='player1'>Player 1</p>
+        <p variant="outline" color="dark" id='player2'>Player 2</p>
+        <p variant="outline" color="dark" id='player3'>Player 3</p>
       </Center>
       <Center>
         <div className='card'>

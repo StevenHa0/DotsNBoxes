@@ -51,8 +51,9 @@ body {
 
 .card {
   padding-top: 5vmin;
-  width: 50vh;
-  height: 50vh;
+  width: 100vw;
+  max-width: 350px;
+  height: 50%;
 }
 
 #player1 {
@@ -61,8 +62,8 @@ body {
 }
 
 #count {
-  margin-left: 60px;
-  margin-right: 60px;
+  margin-left: 45px;
+  margin-right: 45px;
   margin-bottom: -10px;
 }
 
