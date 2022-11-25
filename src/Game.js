@@ -95,24 +95,6 @@ const Game = () => {
       points: [x1, y1, x2, y2],
       id: id.toString(),
     });
-    // TODO: create a function that draws a line on the grid
-    // to the nearest pointer position on the stage
-    // stage.on("click", function () {
-    //   let mousePos = stage.getPointerPosition();
-    //   let lineId = getNearestLineId(mousePos.x, mousePos.y);
-    //   if (!sides[id]) {
-    //     line.stroke(getColor());
-    //     line.opacity(1);
-    //     addLine(lineId, layer);
-    //   }
-    // });
-    // line.on("click", function () {
-    //   if (!sides[id]) {
-    //     this.stroke(getColor());
-    //     this.opacity(1);
-    //     addLine(id, layer);
-    //   }
-    // });
     layer.add(line);
   }
 
@@ -238,12 +220,12 @@ const Game = () => {
       let lineId = getNearestLineId(mousePos.x, mousePos.y);
       if (!sides[lineId]) {
         let line = stage.findOne("#" + lineId);
-        addLine(lineId);
         new Konva.Tween({
           node: line,
           stroke: getColor(),
           opacity: 1,
         }).play();
+        addLine(lineId);
       }
     });
     // Draw the corresponding 4 x 4 dots
@@ -277,9 +259,54 @@ const Game = () => {
     player3Count,
     firstPlace
   ) {
-    if (firstPlace === player1Count) setFirstPlacePlayer("Player 1");
-    else if (firstPlace === player2Count) setFirstPlacePlayer("Player 2");
-    else if (firstPlace === player3Count) setFirstPlacePlayer("Player 3");
+    if (
+      firstPlace === player1Count &&
+      firstPlace > player2Count &&
+      firstPlace > player3Count
+    )
+      setFirstPlacePlayer("Player 1 wins with " + firstPlace + " points!");
+    else if (
+      firstPlace === player2Count &&
+      firstPlace > player1Count &&
+      firstPlace > player3Count
+    )
+      setFirstPlacePlayer("Player 2 wins with " + firstPlace + " points!");
+    else if (
+      firstPlace === player3Count &&
+      firstPlace > player1Count &&
+      firstPlace > player2Count
+    )
+      setFirstPlacePlayer("Player 3 wins with " + firstPlace + " points!");
+    else if (
+      firstPlace === player1Count &&
+      firstPlace === player2Count &&
+      firstPlace > player3Count
+    )
+      setFirstPlacePlayer(
+        "Player 1 and 2 tied with " + firstPlace + " points!"
+      );
+    else if (
+      firstPlace === player1Count &&
+      firstPlace === player3Count &&
+      firstPlace > player2Count
+    )
+      setFirstPlacePlayer(
+        "Player 1 and 3 tied with " + firstPlace + " points!"
+      );
+    else if (
+      firstPlace === player2Count &&
+      firstPlace === player3Count &&
+      firstPlace > player1Count
+    )
+      setFirstPlacePlayer(
+        "Player 2 and 3 tied with " + firstPlace + " points!"
+      );
+    else if (
+      firstPlace === player2Count &&
+      firstPlace === player3Count &&
+      firstPlace === player1Count
+    )
+      setFirstPlacePlayer("All players tied with " + firstPlace + " points!");
   }
 
   // Draws the stage on start
@@ -320,9 +347,7 @@ const Game = () => {
         }}
       >
         <h1>Results:</h1>
-        <p>
-          Winner: {firstPlacePlayer} with a score of {firstPlace}
-        </p>
+        <p>{firstPlacePlayer}</p>
       </Modal>
       <Center>
         <p variant="outline" color="dark" id="player1">
