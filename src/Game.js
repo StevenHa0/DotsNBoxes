@@ -1,20 +1,3 @@
-// TODO FUNCTIONS (Assignment not completed in time):
-// 1. Connect the Konva Lines to the Konva Circles (the dots)
-// 2. When a "Square" is created, set the color of the player
-//    to the player that completed the square
-// 3. Update the score of the player who completed a square
-// 4. Create a function that detects if all dots have been connected
-// 5. Create a popup window to announce the winner with the highest score
-////////////////////////
-/**
- * Since I did not complete the project in time, I instead created a counter
- * for each player to manually increase the score.
- * I also added a button to end the game, which displays the player with
- * the highest score.
- *
- * I hope my work is still considered, I have put in many hours into this assignment.
- */
-
 import "./App.css";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
@@ -54,7 +37,6 @@ const Game = () => {
 
   // State to open and close pop-up windows
   const [endGameOpened, setEndGameOpened] = useState(false);
-  const [firstPlace, setFirstPlace] = useState(0);
   const [firstPlacePlayer, setFirstPlacePlayer] = useState("");
 
   function incrementPlayerCount() {
@@ -98,6 +80,19 @@ const Game = () => {
     layer.add(line);
   }
 
+  function drawEmptySquare(x, y, layer, id) {
+    const square = new Konva.Rect({
+      x: x,
+      y: y,
+      width: 76,
+      height: 76,
+      opacity: 0.5,
+      fill: "white",
+      id: id.toString() + "s",
+    });
+    layer.add(square);
+  }
+
   function getNearestLineId(mousePosX, mousePosY) {
     let nearest = 1000;
     let minLineId = 1000;
@@ -125,61 +120,114 @@ const Game = () => {
     return minLineId;
   }
 
-  function addLine(id) {
+  function addLine(id, stage) {
     sides[id] = true;
-    if (squareComplete()) {
-      // TODO: fill complete square with player color
+    if (squareComplete(stage)) {
     } else {
       currentTurn++;
       if (currentTurn > 3) currentTurn = 1;
     }
   }
 
-  function squareComplete() {
+  function squareComplete(stage) {
     const prev_squaresfilled = squaresfilled;
     if (!square1filled && sides[0] && sides[1] && sides[6] && sides[7]) {
       square1filled = true;
       squaresfilled++;
+      let square = stage.findOne("#" + 0 + "s");
+      new Konva.Tween({
+        node: square,
+        fill: getColor(),
+        opacity: 0.5,
+      }).play();
       incrementPlayerCount();
     }
     if (!square2filled && sides[2] && sides[7] && sides[8] && sides[13]) {
       square2filled = true;
       squaresfilled++;
+      let square = stage.findOne("#" + 1 + "s");
+      new Konva.Tween({
+        node: square,
+        fill: getColor(),
+        opacity: 0.5,
+      }).play();
       incrementPlayerCount();
     }
     if (!square3filled && sides[4] && sides[13] && sides[10] && sides[19]) {
       square3filled = true;
       squaresfilled++;
+      let square = stage.findOne("#" + 2 + "s");
+      new Konva.Tween({
+        node: square,
+        fill: getColor(),
+        opacity: 0.5,
+      }).play();
       incrementPlayerCount();
     }
     if (!square4filled && sides[6] && sides[3] && sides[9] && sides[12]) {
       square4filled = true;
       squaresfilled++;
+      let square = stage.findOne("#" + 3 + "s");
+      new Konva.Tween({
+        node: square,
+        fill: getColor(),
+        opacity: 0.5,
+      }).play();
       incrementPlayerCount();
     }
     if (!square5filled && sides[8] && sides[9] && sides[14] && sides[15]) {
       square5filled = true;
       squaresfilled++;
+      let square = stage.findOne("#" + 4 + "s");
+      new Konva.Tween({
+        node: square,
+        fill: getColor(),
+        opacity: 0.5,
+      }).play();
       incrementPlayerCount();
     }
     if (!square6filled && sides[10] && sides[15] && sides[16] && sides[21]) {
       square6filled = true;
       squaresfilled++;
+      let square = stage.findOne("#" + 5 + "s");
+      new Konva.Tween({
+        node: square,
+        fill: getColor(),
+        opacity: 0.5,
+      }).play();
       incrementPlayerCount();
     }
     if (!square7filled && sides[12] && sides[5] && sides[18] && sides[11]) {
       square7filled = true;
       squaresfilled++;
+      let square = stage.findOne("#" + 6 + "s");
+      new Konva.Tween({
+        node: square,
+        fill: getColor(),
+        opacity: 0.5,
+      }).play();
       incrementPlayerCount();
     }
     if (!square8filled && sides[14] && sides[11] && sides[20] && sides[17]) {
       square8filled = true;
       squaresfilled++;
+      let square = stage.findOne("#" + 7 + "s");
+      new Konva.Tween({
+        node: square,
+        fill: getColor(),
+        opacity: 0.5,
+      }).play();
       incrementPlayerCount();
     }
     if (!square9filled && sides[16] && sides[17] && sides[22] && sides[23]) {
       square9filled = true;
       squaresfilled++;
+      let square = stage.findOne("#" + 8 + "s");
+      new Konva.Tween({
+        node: square,
+        fill: getColor(),
+        opacity: 0.5,
+      }).play();
       incrementPlayerCount();
     }
     // if the amount of squares filled before is less than now, return true
@@ -201,18 +249,27 @@ const Game = () => {
       width: 319,
       container: "konva-holder",
     });
-    const layer = new Konva.Layer();
-    stage.add(layer);
+    const layer1 = new Konva.Layer();
+    stage.add(layer1);
+    let squareId = 0;
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        drawEmptySquare(getX(j), getY(i), layer1, squareId);
+        squareId++;
+      }
+    }
+    const layer2 = new Konva.Layer();
+    stage.add(layer2);
     // Draw empty lines for the user to click on
-    var id = 0;
+    let lineId = 0;
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 3; j++) {
         // horizontal line
-        drawEmptyLine(getX(j), getY(i), getX(j + 1), getY(i), layer, id, stage);
-        id++;
+        drawEmptyLine(getX(j), getY(i), getX(j + 1), getY(i), layer2, lineId);
+        lineId++;
         // vertical line
-        drawEmptyLine(getX(i), getY(j), getX(i), getY(j + 1), layer, id, stage);
-        id++;
+        drawEmptyLine(getX(i), getY(j), getX(i), getY(j + 1), layer2, lineId);
+        lineId++;
       }
     }
     stage.on("click", function () {
@@ -223,15 +280,16 @@ const Game = () => {
         new Konva.Tween({
           node: line,
           stroke: getColor(),
+          duration: 0,
           opacity: 1,
         }).play();
-        addLine(lineId);
+        addLine(lineId, stage);
       }
     });
     // Draw the corresponding 4 x 4 dots
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 4; j++) {
-        drawDot(getX(j), getY(i), layer);
+        drawDot(getX(j), getY(i), layer2);
       }
     }
     return stage;
@@ -249,7 +307,6 @@ const Game = () => {
 
   function findFirstPlace(player1Count, player2Count, player3Count) {
     var rank = [player1Count, player2Count, player3Count].sort().reverse();
-    setFirstPlace(rank[0]);
     return rank[0];
   }
 
