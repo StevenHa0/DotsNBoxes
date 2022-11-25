@@ -39,6 +39,10 @@
   font-size: 26px;
 }
 
+.modal {
+  margin-top: 30vmin;
+}
+
 .leave-game {
   margin: 20px;
   position: absolute;
@@ -47,7 +51,7 @@
 
 body {
   margin: 0;
-  font-family: 'Gotham';
+  font-family: "Gotham";
 }
 
 .card {
@@ -89,6 +93,6 @@ body {
 }
 
 @font-face {
-  font-family: 'Gotham';
-  src: url('fonts/Gotham Medium.otf');
+  font-family: "Gotham";
+  src: url("fonts/Gotham Medium.otf");
 }

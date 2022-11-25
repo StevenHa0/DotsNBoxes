@@ -29,6 +29,7 @@ const MARGIN = SIZE - GRID_SIZE * CELL;
 // game vars
 var currentTurn = 1;
 var sides = {};
+var lineCoords = {};
 var square1filled = false;
 var square2filled = false;
 var square3filled = false;
@@ -83,6 +84,8 @@ const Game = () => {
   }
 
   function drawEmptyLine(x1, y1, x2, y2, layer, id) {
+    lineCoords[id] = { x1, y1, x2, y2, id };
+    sides[id] = false;
     const line = new Konva.Line({
       stroke: "black",
       opacity: 0.2,
@@ -92,19 +95,57 @@ const Game = () => {
       points: [x1, y1, x2, y2],
       id: id.toString(),
     });
-    line.on("click", function () {
-      if (!sides[id]) {
-        this.stroke(getColor());
-        this.opacity(1);
-        addLine(id, layer);
-      }
-    });
+    // TODO: create a function that draws a line on the grid
+    // to the nearest pointer position on the stage
+    // stage.on("click", function () {
+    //   let mousePos = stage.getPointerPosition();
+    //   let lineId = getNearestLineId(mousePos.x, mousePos.y);
+    //   if (!sides[id]) {
+    //     line.stroke(getColor());
+    //     line.opacity(1);
+    //     addLine(lineId, layer);
+    //   }
+    // });
+    // line.on("click", function () {
+    //   if (!sides[id]) {
+    //     this.stroke(getColor());
+    //     this.opacity(1);
+    //     addLine(id, layer);
+    //   }
+    // });
     layer.add(line);
   }
 
-  function addLine(id, layer) {
+  function getNearestLineId(mousePosX, mousePosY) {
+    let nearest = 1000;
+    let minLineId = 1000;
+    for (let i = 0; i < Object.keys(lineCoords).length; i++) {
+      if (lineCoords[i].y1 === lineCoords[i].y2) {
+        if (
+          Math.abs(mousePosY - lineCoords[i].y1) < nearest &&
+          mousePosX > lineCoords[i].x1 &&
+          mousePosX < lineCoords[i].x1 + 76
+        ) {
+          nearest = Math.abs(mousePosY - lineCoords[i].y1);
+          minLineId = lineCoords[i].id;
+        }
+      } else if (lineCoords[i].x1 === lineCoords[i].x2) {
+        if (
+          Math.abs(mousePosX - lineCoords[i].x1) < nearest &&
+          mousePosY > lineCoords[i].y1 &&
+          mousePosY < lineCoords[i].y1 + 76
+        ) {
+          nearest = Math.abs(mousePosX - lineCoords[i].x1);
+          minLineId = lineCoords[i].id;
+        }
+      }
+    }
+    return minLineId;
+  }
+
+  function addLine(id) {
     sides[id] = true;
-    if (squareComplete(layer)) {
+    if (squareComplete()) {
       // TODO: fill complete square with player color
     } else {
       currentTurn++;
@@ -185,13 +226,27 @@ const Game = () => {
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 3; j++) {
         // horizontal line
-        drawEmptyLine(getX(j), getY(i), getX(j + 1), getY(i), layer, id);
+        drawEmptyLine(getX(j), getY(i), getX(j + 1), getY(i), layer, id, stage);
         id++;
         // vertical line
-        drawEmptyLine(getX(i), getY(j), getX(i), getY(j + 1), layer, id);
+        drawEmptyLine(getX(i), getY(j), getX(i), getY(j + 1), layer, id, stage);
         id++;
       }
     }
+    stage.on("click", function () {
+      var tween;
+      let mousePos = stage.getPointerPosition();
+      let lineId = getNearestLineId(mousePos.x, mousePos.y);
+      if (!sides[lineId]) {
+        let line = stage.findOne("#" + lineId);
+        addLine(lineId);
+        tween = new Konva.Tween({
+          node: line,
+          stroke: getColor(),
+          opacity: 1,
+        }).play();
+      }
+    });
     // Draw the corresponding 4 x 4 dots
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 4; j++) {
@@ -233,7 +288,7 @@ const Game = () => {
     drawStage();
   }, []);
 
-  // Triggered when total count === 9
+  // Triggered when game is over (ie. total count is 9)
   useEffect(() => {
     if (player1Count + player2Count + player3Count === 9) {
       let firstPlace = findFirstPlace(player1Count, player2Count, player3Count);
@@ -258,6 +313,7 @@ const Game = () => {
         <p id="count">{player3Count}</p>
       </Center>
       <Modal
+        className="modal"
         opened={endGameOpened}
         onClose={() => {
           setEndGameOpened(false);
