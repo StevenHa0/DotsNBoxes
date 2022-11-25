@@ -272,7 +272,7 @@ const Game = () => {
         lineId++;
       }
     }
-    stage.on("click", function () {
+    stage.on("click touchstart", function () {
       let mousePos = stage.getPointerPosition();
       let lineId = getNearestLineId(mousePos.x, mousePos.y);
       if (!sides[lineId]) {
