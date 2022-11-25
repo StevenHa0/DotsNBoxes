@@ -11,26 +11,23 @@
  * for each player to manually increase the score.
  * I also added a button to end the game, which displays the player with
  * the highest score.
- * 
+ *
  * I hope my work is still considered, I have put in many hours into this assignment.
  */
 
-import './App.css';
-import React, { useState, useEffect } from 'react'
+import "./App.css";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Button, Card, Center, Modal } from '@mantine/core';
-import Konva from 'konva';
+import { Button, Card, Center, Modal } from "@mantine/core";
+import Konva from "konva";
 
 const GRID_SIZE = 4; // number of dots
 const SIZE = 380; // width and height of game board
 const CELL = SIZE / (GRID_SIZE + 1); // size of cells (as well as left and right margin)
-const MARGIN = SIZE - (GRID_SIZE) * CELL;
+const MARGIN = SIZE - GRID_SIZE * CELL;
 
 // game vars
 var currentTurn = 1;
-var totalCount = 0;
-var firstPlace;
-var firstPlacePlayer;
 var sides = {};
 var square1filled = false;
 var square2filled = false;
@@ -44,38 +41,31 @@ var square9filled = false;
 var squaresfilled = 0;
 
 // colors
-const COLOR_P1 = 'red';
-const COLOR_P2 = 'blue';
-const COLOR_P3 = 'green';
+const COLOR_P1 = "red";
+const COLOR_P2 = "blue";
+const COLOR_P3 = "green";
 
 const Game = () => {
-
   // State to store count value
-  const [player1Count, setCount1] = useState(0);
-  const [player2Count, setCount2] = useState(0);
-  const [player3Count, setCount3] = useState(0);
+  const [player1Count, setPlayer1Count] = useState(0);
+  const [player2Count, setPlayer2Count] = useState(0);
+  const [player3Count, setPlayer3Count] = useState(0);
 
   // State to open and close pop-up windows
   const [endGameOpened, setEndGameOpened] = useState(false);
-
-  // Functions to increment player count by 1
-  function incrementPlayer1Count() { setCount1(player1Count => player1Count + 1) };
-  function incrementPlayer2Count() { setCount2(player2Count => player2Count + 1) };
-  function incrementPlayer3Count() { setCount3(player3Count => player3Count + 1) };
+  const [firstPlace, setFirstPlace] = useState(0);
+  const [firstPlacePlayer, setFirstPlacePlayer] = useState("");
 
   function incrementPlayerCount() {
-    switch(currentTurn) {
+    switch (currentTurn) {
       case 1:
-        incrementPlayer1Count();
-        totalCount++;
+        setPlayer1Count((player1Count) => player1Count + 1);
         break;
       case 2:
-        incrementPlayer2Count();
-        totalCount++;
+        setPlayer2Count((player2Count) => player2Count + 1);
         break;
       case 3:
-        incrementPlayer3Count();
-        totalCount++;
+        setPlayer3Count((player3Count) => player3Count + 1);
         break;
       default:
         break;
@@ -86,7 +76,7 @@ const Game = () => {
     const dot = new Konva.Circle({
       x: x,
       y: y,
-      fill: 'black',
+      fill: "black",
       radius: 6,
     });
     layer.add(dot);
@@ -94,15 +84,15 @@ const Game = () => {
 
   function drawEmptyLine(x1, y1, x2, y2, layer, id) {
     const line = new Konva.Line({
-        stroke: 'black',
-        opacity: 0.2,
-        strokeWidth: 5,
-        lineCap: 'round',
-        lineJoin: 'round',
-        points: [x1, y1, x2, y2],
-        id: id.toString()
+      stroke: "black",
+      opacity: 0.2,
+      strokeWidth: 5,
+      lineCap: "round",
+      lineJoin: "round",
+      points: [x1, y1, x2, y2],
+      id: id.toString(),
     });
-    line.on('click', function () {
+    line.on("click", function () {
       if (!sides[id]) {
         this.stroke(getColor());
         this.opacity(1);
@@ -114,17 +104,11 @@ const Game = () => {
 
   function addLine(id, layer) {
     sides[id] = true;
-    console.log(totalCount);
     if (squareComplete(layer)) {
       // TODO: fill complete square with player color
-      if (totalCount === 9) {
-        setEndGameOpened(true);
-        endGame();
-      }
     } else {
-      currentTurn++
-      if (currentTurn > 3)
-        currentTurn = 1;
+      currentTurn++;
+      if (currentTurn > 3) currentTurn = 1;
     }
   }
 
@@ -176,10 +160,8 @@ const Game = () => {
       incrementPlayerCount();
     }
     // if the amount of squares filled before is less than now, return true
-    if (prev_squaresfilled < squaresfilled)
-      return true;
-    else
-      return false;
+    if (prev_squaresfilled < squaresfilled) return true;
+    else return false;
   }
 
   function getX(x) {
@@ -191,12 +173,11 @@ const Game = () => {
   }
 
   function drawStage() {
-    var stage = new Konva.Stage ({
+    var stage = new Konva.Stage({
       height: 300,
       width: 319,
       container: "konva-holder",
     });
-    stage.getRelativePointerPosition();
     const layer = new Konva.Layer();
     stage.add(layer);
     // Draw empty lines for the user to click on
@@ -204,10 +185,10 @@ const Game = () => {
     for (let i = 0; i < 4; i++) {
       for (let j = 0; j < 3; j++) {
         // horizontal line
-        drawEmptyLine(getX(j), getY(i), getX(j+1), getY(i), layer, id);
+        drawEmptyLine(getX(j), getY(i), getX(j + 1), getY(i), layer, id);
         id++;
         // vertical line
-        drawEmptyLine(getX(i), getY(j), getX(i), getY(j+1), layer, id);
+        drawEmptyLine(getX(i), getY(j), getX(i), getY(j + 1), layer, id);
         id++;
       }
     }
@@ -223,70 +204,102 @@ const Game = () => {
   function getColor() {
     if (currentTurn === 1) {
       return COLOR_P1;
-    }
-    else if (currentTurn === 2) {
+    } else if (currentTurn === 2) {
       return COLOR_P2;
-    }
-    else if (currentTurn === 3) {
+    } else if (currentTurn === 3) {
       return COLOR_P3;
     }
   }
 
-  function endGame() {
+  function findFirstPlace(player1Count, player2Count, player3Count) {
     var rank = [player1Count, player2Count, player3Count].sort().reverse();
-    firstPlace = rank[0];
-
-    if (firstPlace === player1Count)
-      firstPlacePlayer = 'Player 1';
-    else if (firstPlace === player2Count)
-      firstPlacePlayer = 'Player 2';
-    else if (firstPlace === player3Count)
-      firstPlacePlayer = 'Player 3';
+    setFirstPlace(rank[0]);
+    return rank[0];
   }
 
+  function findFirstPlacePlayer(
+    player1Count,
+    player2Count,
+    player3Count,
+    firstPlace
+  ) {
+    if (firstPlace === player1Count) setFirstPlacePlayer("Player 1");
+    else if (firstPlace === player2Count) setFirstPlacePlayer("Player 2");
+    else if (firstPlace === player3Count) setFirstPlacePlayer("Player 3");
+  }
+
+  // Draws the stage on start
   useEffect(() => {
     drawStage();
-  }, [])
+  }, []);
+
+  // Triggered when total count === 9
+  useEffect(() => {
+    if (player1Count + player2Count + player3Count === 9) {
+      let firstPlace = findFirstPlace(player1Count, player2Count, player3Count);
+      findFirstPlacePlayer(
+        player1Count,
+        player2Count,
+        player3Count,
+        firstPlace
+      );
+      setEndGameOpened(true);
+    }
+  }, [player1Count, player2Count, player3Count]);
 
   return (
-    <div className="Game">
+    <div>
       <Center>
-        <p className='game-title'>
-          Dots N Boxes
-        </p>
+        <p className="game-title">Dots N Boxes</p>
       </Center>
       <Center>
-          <Button size="lg" variant="subtle" component={Link} to="/">
-              Home
-          </Button>
+        <p id="count">{player1Count}</p>
+        <p id="count">{player2Count}</p>
+        <p id="count">{player3Count}</p>
       </Center>
-      <Center>
-        <p id='count'>{player1Count}</p>
-        <p id='count'>{player2Count}</p>
-        <p id='count'>{player3Count}</p>
-      </Center>
-      <Modal opened={endGameOpened} onClose={() => {
+      <Modal
+        opened={endGameOpened}
+        onClose={() => {
           setEndGameOpened(false);
           document.location.reload();
         }}
       >
-          <h1>Results:</h1>
-          <p>Winner: {firstPlacePlayer} with a score of {firstPlace}</p>
+        <h1>Results:</h1>
+        <p>
+          Winner: {firstPlacePlayer} with a score of {firstPlace}
+        </p>
       </Modal>
       <Center>
-        <p variant="outline" color="dark" id='player1'>Player 1</p>
-        <p variant="outline" color="dark" id='player2'>Player 2</p>
-        <p variant="outline" color="dark" id='player3'>Player 3</p>
+        <p variant="outline" color="dark" id="player1">
+          Player 1
+        </p>
+        <p variant="outline" color="dark" id="player2">
+          Player 2
+        </p>
+        <p variant="outline" color="dark" id="player3">
+          Player 3
+        </p>
       </Center>
       <Center>
-        <div className='card'>
+        <div className="card">
           <Card withBorder shadow="sm" radius="md">
             <div id="konva-holder"></div>
           </Card>
         </div>
       </Center>
+      <Center>
+        <Button
+          className="leave-game"
+          size="lg"
+          variant="subtle"
+          component={Link}
+          to="/"
+        >
+          Leave Game
+        </Button>
+      </Center>
     </div>
   );
-}
+};
 
 export default Game;
