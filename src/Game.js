@@ -234,13 +234,12 @@ const Game = () => {
       }
     }
     stage.on("click", function () {
-      var tween;
       let mousePos = stage.getPointerPosition();
       let lineId = getNearestLineId(mousePos.x, mousePos.y);
       if (!sides[lineId]) {
         let line = stage.findOne("#" + lineId);
         addLine(lineId);
-        tween = new Konva.Tween({
+        new Konva.Tween({
           node: line,
           stroke: getColor(),
           opacity: 1,
