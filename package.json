@@ -2,7 +2,7 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://stevenha0.github.io/DotsNBoxes/",
+  "homepage": "https://stevenha0.github.io/DotsNBoxes/#",
   "dependencies": {
     "@mantine/core": "^5.6.4",
     "@testing-library/jest-dom": "^5.16.5",
